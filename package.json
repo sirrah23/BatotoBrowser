@@ -9,6 +9,8 @@
   "author": "sirrah23",
   "license": "ISC",
   "dependencies": {
-    "puppeteer": "^0.13.0"
+    "knex": "^0.14.2",
+    "puppeteer": "^0.13.0",
+    "sqlite3": "^3.1.13"
   }
 }

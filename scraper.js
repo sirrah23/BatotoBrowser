@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const creds = require('./creds.js');
+const db = require('./db.js');
 
 async function run(){
   const browser = await puppeteer.launch({
@@ -8,7 +9,7 @@ async function run(){
   const page = await browser.newPage();
 
   await page.goto('https://bato.to/forums/index.php?app=core&module=global&section=login');
-  await page.waitFor(2*3000);
+  await page.waitFor(3*1000); //Wait for the page to load
 
   // Selectors
   const SIGN_IN_SELECTOR = "#sign_in";
@@ -17,7 +18,7 @@ async function run(){
   const SUBMIT_SELECTOR = ".input_submit";
   const FOLLOWS_SELECTOR = "#nav_menu_4_trigger";
 
-  //Login
+  //Login and navigate to Follows
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type(creds.username);
 
@@ -25,51 +26,50 @@ async function run(){
   await page.keyboard.type(creds.password);
 
   await page.click(SUBMIT_SELECTOR);
-
   await page.waitForNavigation();
 
+  await page.waitFor(3*1000); // Wait for buttons to load up then click
   await page.click(FOLLOWS_SELECTOR);
 
-
-  await page.waitFor(2*4000);
-
-  //Gather list of follows
+  await page.waitFor(8*1000); // Wait for list of followed manga to load up
+  //Gather list of followed manga
+  let manga_data;
+  const res = [];
   let index=1;
   let done = false;
-  const res = [];
   const follow_template = "div.clearfix:nth-child(5) > div:nth-child(INDEX)";
 
   while(!done){
 
+    //Scrape the next followed manga
     let scrape_res = await page.evaluate((sel) => {
+
       const follow = document.querySelector(sel);
-      if (follow === null){
+
+      if (!follow){
         return [false, null];
       }
+
       if(follow.children.length === 0){
         return [follow.innerHTML.startsWith("Total:"), null];
       }
+
       const follow_data = follow.children[0];
-      if(follow_data.href === null){
+      if(!follow_data.href){
         return [false, null];
       }
-      return [false, {name: follow_data.innerHTML, link: follow_data.href}];
+
+      return [false, {title: follow_data.innerHTML, link: follow_data.href}];
     }, follow_template.replace("INDEX", index));
 
+    //If data was scraped successfully then store it
     done = scrape_res[0];
-    let manga_data = scrape_res[1];
-
-    if(manga_data !== null){
+    manga_data = scrape_res[1];
+    if(manga_data && manga_data.link){
       res.push(manga_data);
     }
 
-
     index += 1;
-
-    if(index > 199){
-      console.log("Shit never ended");
-      break;
-    }
   }
 
   browser.close();
@@ -78,11 +78,14 @@ async function run(){
 }
 
 run()
-  .then(function(res){
-    console.log(res);
-    console.log(res.length);
+  .then((manga) => {
+    console.log(`Scraped ${manga.length} manga`);
+    return db.insertMany(manga);
   })
-  .catch(function(err){
+  .then(() => {
+    console.log("Manga has been loaded into the database");
+  })
+  .catch((err) => {
     console.log(err);
   });
 
