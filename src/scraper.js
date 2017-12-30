@@ -1,11 +1,13 @@
-const puppeteer = require('puppeteer');
-const creds = require('./creds.js');
-const db = require('./db.js');
+/**
+* Logs into bato.to and grabs a list of all of the
+* manga that you are currently following. A title and
+* link is obtained for each manga.
+*/
 
-async function run(){
-  const browser = await puppeteer.launch({
-    headless: false
-  });
+const puppeteer = require('puppeteer');
+
+async function scrape(username, password){
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   await page.goto('https://bato.to/forums/index.php?app=core&module=global&section=login');
@@ -20,10 +22,10 @@ async function run(){
 
   //Login and navigate to Follows
   await page.click(USERNAME_SELECTOR);
-  await page.keyboard.type(creds.username);
+  await page.keyboard.type(username);
 
   await page.click(PASSWORD_SELECTOR);
-  await page.keyboard.type(creds.password);
+  await page.keyboard.type(password);
 
   await page.click(SUBMIT_SELECTOR);
   await page.waitForNavigation();
@@ -77,15 +79,4 @@ async function run(){
   return res;
 }
 
-run()
-  .then((manga) => {
-    console.log(`Scraped ${manga.length} manga`);
-    return db.insertMany(manga);
-  })
-  .then(() => {
-    console.log("Manga has been loaded into the database");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
+module.exports=scrape;
