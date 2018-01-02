@@ -10,20 +10,33 @@ const db = require('./src/db.js')('./data.db');
 const creds = require('./creds.js');
 
 async function scrape_and_load(){
-  const manga = await scrape(creds.username, creds.password);
-  console.log(`Scraped ${manga.length} manga`);
-  await db.insertMany(manga);
-  console.log('Manga loaded into database');
+  let manga = await scrape(creds.username, creds.password);
+  console.log(`Scraped ${manga.length} manga from manga list`);
+  const titles = await db.readAllTitle();
+  manga = manga.filter((m) => titles.indexOf(m.title) === -1);
+  if(manga.length === 0){
+    console.log("No new manga was discovered");
+    return Promise.resolve("No new manga to load");
+  } else {
+    console.log(`${manga.length} new manga discovered`);
+  }
   const downloads = manga.map(m => cover(m.title, m.link));
-  return Promise.all(downloads);
+  console.log("Scraping images for new manga");
+  const manga_with_image = await Promise.all(downloads);
+  const to_insert = [];
+  manga_with_image.forEach((val) => {
+    if (typeof val === "string"){
+      console.log(val);
+    } else {
+      to_insert.push(val);
+    }
+  });
+  await db.insertMany(to_insert);
+  console.log('Manga loaded into database');
+  return Promise.resolve(`${to_insert.length} new manga loaded`);
 }
 
 scrape_and_load()
-  .then((vals) => {
-    vals.forEach((val) => {
-      if(val.startsWith("Error:")){
-        console.log(val);
-      };
-    });
-    console.log("Manga covers downloaded");
+  .then((val) => {
+    console.log(val);
   });

@@ -13,10 +13,11 @@ module.exports = function(dbname){
     }
   });
 
-  knex.schema.createTable('manga', function(table){
+  knex.schema.createTableIfNotExists('manga', function(table){
     table.increments('id');
     table.string('title');
     table.string('link');
+    table.string('image');
   })
     .then()
     .catch((e) => {
@@ -33,6 +34,16 @@ module.exports = function(dbname){
     //Inserts a list of objects with title & link properties
     insertMany: (manga) => {
       return knex('manga').insert(manga);
+    },
+
+    //Read the entire list of manga titles in the manga table
+    readAllTitle: () => {
+      return knex
+        .select('title')
+        .from('manga')
+        .then(vals => {
+          return vals.map(val => val.title);
+        });
     }
 
   };
