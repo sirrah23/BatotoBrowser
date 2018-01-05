@@ -9,10 +9,10 @@ html(lang="en")
     div(class='mangas container')
       each manga in mangas
         div(class='manga')
+          h3(class="title") #{manga.title}
           a(href=manga.link)
             img(
               src=manga.image
               ,alt=manga.title
               ,style="width:280px;height:400px;"
             )
-          h3(class="title") #{manga.title}
