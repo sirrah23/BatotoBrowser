@@ -44,8 +44,14 @@ module.exports = function(dbname){
         .then(vals => {
           return vals.map(val => val.title);
         });
-    }
+    },
 
+    //Read all all columns for all manga in the table
+    readAllData: () => {
+      return knex
+        .select()
+        .from('manga');
+    }
   };
 
 };

@@ -5,9 +5,13 @@ html(lang="en")
   body
     h1 Batoto Browser
     h2 Followed Manga
-    each manga in mangas
-      ul
-        //Just a test
-        li #{manga.title}
-        li #{manga.link}
-        li #{manga.image}
+    div(class='mangas')
+      each manga in mangas
+        div(class='manga')
+          a(href=manga.link)
+            img(
+              src=manga.image
+              ,alt=manga.title
+              ,style="width:280px;height:400px;"
+            )
+          p #{manga.title}
