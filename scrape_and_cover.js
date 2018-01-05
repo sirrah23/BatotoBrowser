@@ -1,11 +1,11 @@
 /**
 * Scrapes your list of followed manga and loads them all
 * into a SQL database. It will also download the cover art
-* for eacn manga.
+* for each manga.
 */
 
 const scrape = require('./src/scraper.js');
-const cover = require('./src/img.js')('./images');
+const cover = require('./src/img.js')('./public/images');
 const db = require('./src/db.js')('./data.db');
 const creds = require('./creds.js');
 

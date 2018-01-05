@@ -2,10 +2,11 @@ doctype html
 html(lang="en")
   head
     title Batoto Browser
+    link(rel="stylesheet", href="css/index.css")
   body
     h1 Batoto Browser
     h2 Followed Manga
-    div(class='mangas')
+    div(class='mangas container')
       each manga in mangas
         div(class='manga')
           a(href=manga.link)
@@ -14,4 +15,4 @@ html(lang="en")
               ,alt=manga.title
               ,style="width:280px;height:400px;"
             )
-          p #{manga.title}
+          h3(class="title") #{manga.title}
