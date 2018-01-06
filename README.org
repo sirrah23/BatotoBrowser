@@ -1,0 +1,36 @@
+* Introduction
+  This is a better way to browse the manga that you are
+  following on Batoto.
+  
+* Prerequisites
+  Make sure that you have nodejs installed.
+
+* Usage
+  Clone the repository and within it create a file called
+  =cred.js=. This file will house your Batoto credentials.
+
+  Populate =cred.js= with the following:
+
+  #+BEGIN_SRC javascript
+  module.exports = {
+      username: "yourusername",
+      password: "yourpassword"
+  }
+  #+END_SRC
+
+  After that you can you can run the scraper to scrape the 
+  manga you follow from Batoto.
+
+  #+BEGIN_SRC javascript
+  node scraper_and_cover.js
+  #+END_SRC
+
+  this will populate your views directory with an html file containing
+  a manga-cover oriented view of your followed manga.
+
+  You can view the file by running the express server:
+
+  #+BEGIN_SRC javascript
+  node server.js
+  #+END_SRC
+  
