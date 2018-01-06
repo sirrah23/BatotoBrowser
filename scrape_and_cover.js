@@ -7,6 +7,7 @@
 const scrape = require('./src/scraper.js');
 const cover = require('./src/img.js')('./public/images');
 const db = require('./src/db.js')('./data.db');
+const pc = require('./src/page_compiler.js');
 const creds = require('./creds.js');
 
 async function scrape_and_load(){
@@ -39,4 +40,12 @@ async function scrape_and_load(){
 scrape_and_load()
   .then((val) => {
     console.log(val);
+    return db.readAllData();
+  })
+  .then(mangas => {
+    pc(mangas, './template/index.pug', './views/index.html');
+  })
+  .catch((e) => {
+    console.log(e);
   });
+

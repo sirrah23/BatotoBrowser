@@ -48,9 +48,7 @@ module.exports = function(dbname){
 
     //Read all all columns for all manga in the table
     readAllData: () => {
-      return knex
-        .select()
-        .from('manga');
+      return knex('manga').orderBy('title', 'asc');
     }
   };
 
